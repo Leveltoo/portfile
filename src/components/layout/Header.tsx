@@ -15,7 +15,7 @@ import {
 const navLinks = [
   { href: '/', label: '首页', icon: <HomeOutlined /> },
   { href: '/projects', label: '项目', icon: <AppstoreOutlined /> },
-  { href: '/about', label: '关于', icon: <UserOutlined /> },
+  { href: '/about', label: '我的里程碑', icon: <UserOutlined /> },
   { href: '/contact', label: '联系', icon: <MailOutlined /> }
 ];
 

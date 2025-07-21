@@ -1,5 +1,5 @@
 import { skills } from '@/data/skills';
-import { workExperiences } from '@/data/work-experience';
+import { milestones } from '@/data/work-experience';
 
 export default function AboutPage() {
   return (
@@ -12,22 +12,37 @@ export default function AboutPage() {
         </p>
       </section>
 
-      {/* --- Work Experience --- */}
+      {/* --- Milestones Timeline --- */}
       <section className="mb-20">
-        <h2 className="text-3xl font-bold text-cyan-400 mb-8 text-center">工作经历</h2>
+        <h2 className="text-3xl font-bold text-cyan-400 mb-8 text-center">我的里程碑</h2>
         <div className="relative border-l-2 border-cyan-500/30 pl-8 space-y-12">
-          {workExperiences.map((exp, index) => (
-            <div key={index} className="relative">
+          {milestones.map((milestone, index) => (
+            <div
+              key={index}
+              className="relative bg-gray-800/50 p-6 rounded-lg shadow-md border border-gray-700"
+            >
+              {' '}
+              {/* Added styling here */}
               <div className="absolute -left-10 top-1 w-4 h-4 bg-cyan-400 rounded-full animate-pulse"></div>
-              <h3 className="text-2xl font-semibold">
-                {exp.role} <span className="text-gray-400">@ {exp.company}</span>
-              </h3>
-              <p className="text-gray-500 mb-4">{exp.period}</p>
+              <h3 className="text-2xl font-semibold">{milestone.title}</h3>
+              <p className="text-gray-500 mb-4">{milestone.period}</p>
               <ul className="list-disc list-inside space-y-2 text-gray-300">
-                {exp.description.map((desc, i) => (
+                {milestone.description.map((desc, i) => (
                   <li key={i}>{desc}</li>
                 ))}
               </ul>
+              {/* 添加技能展示 */}
+              <div className="flex flex-wrap gap-2 mt-4">
+                {milestone.skills.map((skill) => (
+                  <div
+                    key={skill.name}
+                    className="flex items-center gap-1 bg-gray-700/50 px-2 py-1 rounded-md text-sm"
+                  >
+                    {skill.icon && <div className={`${skill.icon} text-lg`}></div>}
+                    <span>{skill.name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>

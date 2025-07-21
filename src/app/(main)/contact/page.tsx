@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-const contactEmail = 'your.email@example.com';
+const contactEmail = '1056480375@qq.com';
 
 export default function ContactPage() {
   const [copyStatus, setCopyStatus] = useState('点击复制');
