@@ -1,1 +1,55 @@
 @unocss all;
+
+/* Custom styles injected into UnoCSS layers */
+@layer utilities {
+  /* Keyframes for the flowing gradient animation */
+  @keyframes glowing-current-animation {
+    to {
+      background-position: -200% center;
+    }
+  }
+
+  /* The class that APPLIES the animated glowing text effect */
+  .glowing-current-text {
+    color: transparent;
+
+    /* The GLOW part: a multi-layered text shadow for a bloom effect */
+    text-shadow:
+      0 0 7px rgb(103 232 249 / 50%),
+      0 0 10px rgb(103 232 249 / 50%),
+      0 0 25px rgb(103 232 249 / 30%);
+    background-image: linear-gradient(
+      to right,
+      #06b6d4,
+      /* cyan-500 */ #67e8f9,
+      /* cyan-300 */ #fff,
+      /* white */ #67e8f9,
+      /* cyan-300 */ #06b6d4 /* cyan-500 */
+    );
+    background-clip: text;
+    background-clip: text;
+    background-size: 200% auto;
+    animation: glowing-current-animation 2s linear infinite;
+  }
+
+  /* A utility class to apply the glow effect ONLY ON HOVER */
+  .hover-glowing-current-text:hover {
+    color: transparent;
+    text-shadow:
+      0 0 7px rgb(103 232 249 / 50%),
+      0 0 10px rgb(103 232 249 / 50%),
+      0 0 25px rgb(103 232 249 / 30%);
+    background-image: linear-gradient(to right, #06b6d4, #67e8f9, #fff, #67e8f9, #06b6d4);
+    background-clip: text;
+    background-clip: text;
+    background-size: 200% auto;
+    animation: glowing-current-animation 2s linear infinite;
+  }
+}
+
+/* Base body styles */
+body {
+  font-family: 'Geist Mono', monospace;
+  color: #e0e0e0;
+  background-color: #0a0a0a;
+}

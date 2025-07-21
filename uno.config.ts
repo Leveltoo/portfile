@@ -1,10 +1,14 @@
-import { defineConfig, presetAttributify, presetIcons, presetWebFonts } from 'unocss';
+import { defineConfig, presetAttributify, presetUno, presetWebFonts } from 'unocss';
 
 export default defineConfig({
   presets: [
-    presetAttributify(), // Enables attributify mode
-    presetIcons(), // Enables icon support
-    presetWebFonts({})
+    presetUno(),
+    presetAttributify(),
+    presetWebFonts({
+      provider: 'google',
+      fonts: {
+        mono: ['Geist Mono']
+      }
+    })
   ]
-  // You can add custom rules, shortcuts, etc. here
 });
