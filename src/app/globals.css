@@ -1,18 +1,13 @@
 @unocss;
 
-/* Custom styles injected into UnoCSS layers */
-@layer utilities {
-  /* The core spotlight utility. 
-     We use !important to ensure it wins any specificity conflicts. */
-  .text-spotlight {
-    color: transparent !important;
-    background-image: radial-gradient(
-      circle at var(--mouse-x) var(--mouse-y),
-      #ec4899 0%,
-      /* Pink color */ transparent 20% /* Fade to transparent */
-    );
-    background-clip: text;
-    background-clip: text;
+/* --- Animated Perspective Grid Background --- */
+@keyframes subtle-pan {
+  0% {
+    background-position: 0% 0%;
+  }
+
+  100% {
+    background-position: 100% 100%;
   }
 }
 
@@ -20,5 +15,38 @@
 body {
   font-family: 'Geist Mono', monospace;
   color: #e0e0e0;
-  background-color: #0a0a0a;
+  background-color: #0a0a0a; /* A very dark background */
+
+  /* A complex SVG for a perspective grid with a vignette effect */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3e%3cdefs%3e%3cpattern id='p' width='50' height='50' patternUnits='userSpaceOnUse'%3e%3cpath d='M0 50V0H50' fill='none' stroke='rgba(0,255,255,0.2)'/%3e%3c/pattern%3e%3cmask id='m'%3e%3crect width='100%25' height='100%25' fill='white'/%3e%3crect width='100%25' height='100%25' fill='url(%23g)'/%3e%3c/mask%3e%3cradialGradient id='g'%3e%3cstop stop-color='black' offset='20%25'/%3e%3cstop stop-color='transparent' offset='70%25'/%3e%3c/radialGradient%3e%3c/defs%3e%3crect width='100%25' height='100%25' fill='url(%23p)' mask='url(%23m)'/%3e%3c/svg%3e");
+  background-size: 200px 200px;
+  animation: subtle-pan 120s linear infinite;
+}
+
+/* Custom styles injected into UnoCSS layers */
+@layer utilities {
+  /* The class that applies the tech stack gradient text effect */
+  .tech-stack-gradient-text {
+    color: transparent;
+    background-image: linear-gradient(
+      to right bottom,
+      /* Diagonal gradient */ #61dafb,
+      /* React - Blue */ #3178c6,
+      /* TypeScript - Blue */ #4fc08d,
+      /* Vue - Green */ #2b9939,
+      /* Uniapp - Dark Green */ #73c242,
+      /* Cocos - Bright Green */ #47848f,
+      /* Electron - Blue-Green */ #fff /* Three.js/Next.js - White as highlight */
+    );
+    background-clip: text;
+    background-clip: text;
+  }
+
+  /* The class for the active/hovered navigation link capsule */
+  .nav-capsule-active {
+    background-color: rgb(0 255 255 / 10%);
+    border: 1px solid rgb(0 255 255 / 20%);
+    box-shadow: 0 0 15px rgb(0 255 255 / 10%);
+    backdrop-filter: blur(8px);
+  }
 }

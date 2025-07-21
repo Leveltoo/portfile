@@ -3,61 +3,66 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { GithubOutlined } from '@ant-design/icons';
-import { useMouseSpotlight } from '@/hooks/useMouseSpotlight';
+import {
+  GithubOutlined,
+  CodeSandboxOutlined,
+  HomeOutlined,
+  AppstoreOutlined,
+  UserOutlined,
+  MailOutlined
+} from '@ant-design/icons';
 
 const navLinks = [
-  { href: '/', label: '// Home' },
-  { href: '/projects', label: '// Projects' },
-  { href: '/about', label: '// About' }
+  { href: '/', label: '首页', icon: <HomeOutlined /> },
+  { href: '/projects', label: '项目', icon: <AppstoreOutlined /> },
+  { href: '/about', label: '关于', icon: <UserOutlined /> },
+  { href: '/contact', label: '联系', icon: <MailOutlined /> }
 ];
 
 const Header = () => {
   const pathname = usePathname();
-  const logoRef = useMouseSpotlight<HTMLAnchorElement>();
-  const githubRef = useMouseSpotlight<HTMLAnchorElement>();
 
   return (
-    <header className="bg-black/50 backdrop-blur-sm border-b border-blue-500/20 sticky top-0 z-50">
+    <header className="backdrop-blur-sm border-b border-gray-500/20 sticky top-0 z-50">
       <div className="relative container mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Logo - Blue, with Pink Spotlight on Hover */}
+          {/* Logo Area with Ant Design Icon */}
           <div className="z-10">
             <Link
-              ref={logoRef}
               href="/"
-              className="text-3xl font-bold text-blue-400 hover:text-spotlight transition-colors duration-300"
+              className="flex items-center gap-3 text-2xl font-bold text-gray-100 hover:text-cyan-300 transition-colors duration-300"
             >
-              Portfolio
+              <CodeSandboxOutlined className="text-3xl text-cyan-400" />
+              <span className="font-mono">GemChen</span>
             </Link>
           </div>
 
-          {/* Navigation Links - Active Blue */}
-          <nav className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex space-x-10 font-mono">
+          {/* Navigation Links with Capsule Indicator */}
+          <nav className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center justify-center p-1 bg-gray-900/50 rounded-full border border-gray-700">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-xl font-bold tracking-wider transition-colors duration-300 ${
-                    isActive ? 'text-blue-400' : 'text-gray-500 hover:text-pink-400'
+                  className={`flex items-center gap-2 px-6 py-2 rounded-full text-lg font-semibold transition-all duration-300 ${
+                    isActive ? 'nav-capsule-active text-cyan-300' : 'text-gray-400 hover:text-white'
                   }`}
                 >
-                  {link.label}
+                  {link.icon}
+                  <span>{link.label}</span>
                 </Link>
               );
             })}
           </nav>
 
-          {/* Social Icon - Blue, with Pink Spotlight on Hover */}
+          {/* Social Icon with Ant Design Icon */}
           <div className="z-10">
             <a
-              ref={githubRef}
-              href="https://github.com"
+              href="https://github.com/Leveltoo"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-3xl text-blue-400 hover:text-spotlight transition-colors duration-300"
+              className="text-3xl text-gray-400 hover:text-white transition-colors duration-300"
             >
               <GithubOutlined />
             </a>

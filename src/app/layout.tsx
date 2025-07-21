@@ -4,7 +4,7 @@ import { ConfigProvider, theme } from 'antd';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'my next protfile',
+  title: 'GemChen 个人主页',
   description: '作品集 作品集 next 全栈 前端 后端 接单 简历 项目 个人主页'
 };
 
