@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky",
-    "commit": "cz"
+    "commit": "cz && git push"
   },
   "config": {
     "commitizen": {
