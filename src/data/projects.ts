@@ -4,6 +4,8 @@ import { skills } from './skills';
 export const projects: Project[] = [
   {
     id: 'project-1',
+    problem: '', // 根据类型要求补充 problem 属性，初始设为空字符串
+    value: '', // 根据类型要求补充 value 属性，初始设为空字符串
     name: '个人作品集网站',
     description: '一个用于展示个人项目、技能和经验的现代化、响应式网站。',
     longDescription:
@@ -18,6 +20,8 @@ export const projects: Project[] = [
   },
   {
     id: 'project-2',
+    problem: '', // 根据类型要求补充 problem 属性，初始设为空字符串
+    value: '', // 根据类型要求补充 value 属性，初始设为空字符串
     name: '电商后台管理系统',
     description: '一个功能强大的电商后台，支持商品、订单、用户和权限管理。',
     longDescription:
