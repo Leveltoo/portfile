@@ -7,6 +7,8 @@ export interface Project {
   id: string;
   name: string;
   description: string;
+  problem: string; // The problem this project solves
+  value: string; // The value this project brings to users/clients
   longDescription?: string; // For a detailed project page or modal
   imageUrl: string;
   tags: string[];
