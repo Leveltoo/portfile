@@ -1,15 +1,20 @@
 'use client';
 
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect } from 'react';
 import * as THREE from 'three';
 
 const ThreeDBackground: React.FC = () => {
   const mountRef = useRef<HTMLDivElement>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const backgroundParticlesMeshRef = useRef<THREE.Points | null>(null);
-  const particlesMaterialRef = useRef<THREE.ShaderMaterial | null>(null); // New ref for the shader material
+  // Use a single ref to hold all Three.js objects for cleanup
+  const threeJsObjectsRef = useRef<{
+    renderer?: THREE.WebGLRenderer;
+    camera?: THREE.PerspectiveCamera;
+    scene?: THREE.Scene;
+    particles?: THREE.Points;
+    material?: THREE.ShaderMaterial;
+    geometry?: THREE.BufferGeometry;
+    animationFrameId?: number;
+  }>({});
 
   // Vertex Shader for particles
   const vertexShader = `
@@ -49,30 +54,14 @@ const ThreeDBackground: React.FC = () => {
     }
   `;
 
-  const animate = useCallback(() => {
-    if (rendererRef.current && sceneRef.current && cameraRef.current) {
-      // Update uTime uniform
-      if (particlesMaterialRef.current) {
-        particlesMaterialRef.current.uniforms.uTime.value = performance.now() * 0.001;
-      }
-
-      // Background particles subtle rotation
-      if (backgroundParticlesMeshRef.current) {
-        backgroundParticlesMeshRef.current.rotation.y += 0.0005;
-        backgroundParticlesMeshRef.current.rotation.x += 0.0002;
-      }
-
-      rendererRef.current.render(sceneRef.current, cameraRef.current);
-    }
-    requestAnimationFrame(animate);
-  }, []);
-
   useEffect(() => {
     if (!mountRef.current) return;
 
+    const threeJsObjects = threeJsObjectsRef.current;
+
     // Scene, Camera, Renderer setup
     const scene = new THREE.Scene();
-    sceneRef.current = scene;
+    threeJsObjects.scene = scene;
 
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -80,15 +69,15 @@ const ThreeDBackground: React.FC = () => {
       0.1,
       1000
     );
-    cameraRef.current = camera;
+    threeJsObjects.camera = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     mountRef.current.appendChild(renderer.domElement);
-    rendererRef.current = renderer;
+    threeJsObjects.renderer = renderer;
 
     // --- Shared Shader Material ---
-    const sharedParticlesMaterial = new THREE.ShaderMaterial({
+    const material = new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 }
       },
@@ -98,69 +87,86 @@ const ThreeDBackground: React.FC = () => {
       depthTest: false,
       transparent: true
     });
-    particlesMaterialRef.current = sharedParticlesMaterial;
+    threeJsObjects.material = material;
 
     // --- Background Particles ---
-    const backgroundParticlesGeometry = new THREE.BufferGeometry();
-    const backgroundParticlesCount = 20000; // Increased particle count for depth
-    camera.position.z = 100; // Adjust camera position for deeper feel
+    const geometry = new THREE.BufferGeometry();
+    threeJsObjects.geometry = geometry;
+    const backgroundParticlesCount = 20000;
+    camera.position.z = 100;
     const bgPosArray = new Float32Array(backgroundParticlesCount * 3);
-    const bgColorsArray = new Float32Array(backgroundParticlesCount * 3); // For custom colors
-    const bgSizesArray = new Float32Array(backgroundParticlesCount); // For custom sizes
+    const bgColorsArray = new Float32Array(backgroundParticlesCount * 3);
+    const bgSizesArray = new Float32Array(backgroundParticlesCount);
 
-    const bgBaseColor = new THREE.Color(0xadd8e6); // Light blue for better visibility and depth
+    const bgBaseColor = new THREE.Color(0xadd8e6);
 
     for (let i = 0; i < backgroundParticlesCount; i++) {
-      bgPosArray[i * 3] = (Math.random() - 0.5) * 200; // x
-      bgPosArray[i * 3 + 1] = (Math.random() - 0.5) * 200; // y
-      bgPosArray[i * 3 + 2] = (Math.random() - 0.5) * 200; // z
+      bgPosArray[i * 3] = (Math.random() - 0.5) * 200;
+      bgPosArray[i * 3 + 1] = (Math.random() - 0.5) * 200;
+      bgPosArray[i * 3 + 2] = (Math.random() - 0.5) * 200;
 
-      bgColorsArray[i * 3] = bgBaseColor.r + (Math.random() - 0.5) * 0.2; // Add some randomness
+      bgColorsArray[i * 3] = bgBaseColor.r + (Math.random() - 0.5) * 0.2;
       bgColorsArray[i * 3 + 1] = bgBaseColor.g + (Math.random() - 0.5) * 0.2;
       bgColorsArray[i * 3 + 2] = bgBaseColor.b + (Math.random() - 0.5) * 0.2;
-      bgSizesArray[i] = 0.5 + Math.random() * 0.5; // Larger and random initial size for visibility
+      bgSizesArray[i] = 0.5 + Math.random() * 0.5;
     }
 
-    backgroundParticlesGeometry.setAttribute('position', new THREE.BufferAttribute(bgPosArray, 3));
-    backgroundParticlesGeometry.setAttribute(
-      'customColor',
-      new THREE.BufferAttribute(bgColorsArray, 3)
-    );
-    backgroundParticlesGeometry.setAttribute('size', new THREE.BufferAttribute(bgSizesArray, 1));
+    geometry.setAttribute('position', new THREE.BufferAttribute(bgPosArray, 3));
+    geometry.setAttribute('customColor', new THREE.BufferAttribute(bgColorsArray, 3));
+    geometry.setAttribute('size', new THREE.BufferAttribute(bgSizesArray, 1));
 
-    const backgroundParticlesMesh = new THREE.Points(
-      backgroundParticlesGeometry,
-      sharedParticlesMaterial
-    ); // Use shared material
-    scene.add(backgroundParticlesMesh);
-    backgroundParticlesMeshRef.current = backgroundParticlesMesh;
+    const particles = new THREE.Points(geometry, material);
+    scene.add(particles);
+    threeJsObjects.particles = particles;
 
-    // Start animation loop
+    // --- Animation Loop ---
+    const animate = () => {
+      if (
+        threeJsObjects.particles &&
+        threeJsObjects.material &&
+        threeJsObjects.renderer &&
+        threeJsObjects.scene &&
+        threeJsObjects.camera
+      ) {
+        // Slower animation speed
+        threeJsObjects.material.uniforms.uTime.value = performance.now() * 0.0001;
+
+        // Slower and more subtle rotation
+        threeJsObjects.particles.rotation.y += 0.0001;
+        threeJsObjects.particles.rotation.x += 0.00005;
+
+        threeJsObjects.renderer.render(threeJsObjects.scene, threeJsObjects.camera);
+      }
+      threeJsObjects.animationFrameId = requestAnimationFrame(animate);
+    };
     animate();
 
-    // Handle window resize
+    // --- Event Listeners ---
     const handleResize = () => {
-      if (cameraRef.current && rendererRef.current) {
-        cameraRef.current.aspect = window.innerWidth / window.innerHeight;
-        cameraRef.current.updateProjectionMatrix();
-        rendererRef.current.setSize(window.innerWidth, window.innerHeight);
+      if (threeJsObjects.camera && threeJsObjects.renderer) {
+        threeJsObjects.camera.aspect = window.innerWidth / window.innerHeight;
+        threeJsObjects.camera.updateProjectionMatrix();
+        threeJsObjects.renderer.setSize(window.innerWidth, window.innerHeight);
       }
     };
     window.addEventListener('resize', handleResize);
 
-    // Cleanup
+    // --- Cleanup ---
     return () => {
+      if (threeJsObjects.animationFrameId) {
+        cancelAnimationFrame(threeJsObjects.animationFrameId);
+      }
       window.removeEventListener('resize', handleResize);
 
-      if (mountRef.current && rendererRef.current && rendererRef.current.domElement) {
-        mountRef.current.removeChild(rendererRef.current.domElement);
+      if (mountRef.current && threeJsObjects.renderer?.domElement) {
+        mountRef.current.removeChild(threeJsObjects.renderer.domElement);
       }
-      if (rendererRef.current) rendererRef.current.dispose();
-      if (backgroundParticlesGeometry) backgroundParticlesGeometry.dispose();
-      // Only dispose the shared material once
-      if (particlesMaterialRef.current) particlesMaterialRef.current.dispose();
+
+      threeJsObjects.geometry?.dispose();
+      threeJsObjects.material?.dispose();
+      threeJsObjects.renderer?.dispose();
     };
-  }, [animate]);
+  }, []);
 
   return <div ref={mountRef} className="fixed inset-0 z-0" />;
 };
